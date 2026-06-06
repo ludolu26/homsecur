@@ -595,10 +595,10 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;bac
 var COLORS=['#1D9E75','#185FA5','#BA7517','#D4537E','#3B6D11','#5DCAA5','#378ADD','#E24B4A','#7C3AED','#0E7490'];
 var TYPE_ICONS={PIR:'ti-radar',Ouverture:'ti-door',Porte:'ti-door-enter','Fenêtre':'ti-window',Vide:'ti-minus'};
 var ALARM_CFG={
-  arm:{label:'Armement total',sub:'',cls:'btn-red',sms:function(c){return (c||'0912')+'1';},stxt:'Armé — total',sdot:'armed',sbadge:'bad',btxt:'Armé'},
-  partial:{label:'Armement partiel',sub:'',cls:'btn-amber',sms:function(c){return (c||'0912')+'2';},stxt:'Armé — partiel',sdot:'partial',sbadge:'warn',btxt:'Partiel'},
-  disarm:{label:'Désarmer',sub:'',cls:'btn-green',sms:function(c){return (c||'0912')+'0';},stxt:'Désarmé',sdot:'',sbadge:'ok',btxt:'Sécurisé'},
-  panic:{label:'Panique / SOS',sub:'',cls:'btn-pink',sms:function(c){return (c||'0912')+'62';},stxt:'PANIQUE',sdot:'armed',sbadge:'bad',btxt:'SOS !'}
+  arm:{label:'Armement total',sub:'',cls:'btn-red',sms:function(c){return '1';},stxt:'Armé — total',sdot:'armed',sbadge:'bad',btxt:'Armé'},
+  partial:{label:'Armement partiel',sub:'',cls:'btn-amber',sms:function(c){return '2';},stxt:'Armé — partiel',sdot:'partial',sbadge:'warn',btxt:'Partiel'},
+  disarm:{label:'Désarmer',sub:'',cls:'btn-green',sms:function(c){return '0';},stxt:'Désarmé',sdot:'',sbadge:'ok',btxt:'Sécurisé'},
+  panic:{label:'Panique / SOS',sub:'',cls:'btn-pink',sms:function(c){return '62';},stxt:'PANIQUE',sdot:'armed',sbadge:'bad',btxt:'SOS !'}
 };
 
 // ── DONNÉES ──
