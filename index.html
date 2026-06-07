@@ -417,9 +417,10 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;bac
     <div class="sec" style="margin-top:.25rem">Mode invité</div>
     <div class="card">
       <div class="card-title"><i class="ti ti-user-shield"></i>Partager en mode invité</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:.5rem">Donnez ce code PIN à un enfant ou invité. Il accède uniquement aux 4 boutons — sans voir vos réglages.</p>
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:.5rem">Envoyez ce lien à vos enfants — ils arrivent directement sur les 4 boutons sans rien configurer !</p>
       <div class="pin-display" id="pin-display"></div>
-      <button class="share-btn" onclick="copyPin()"><i class="ti ti-copy" style="font-size:15px"></i>Copier le code PIN</button>
+      <button class="share-btn" onclick="copyGuestLink()"><i class="ti ti-link" style="font-size:15px"></i>Copier le lien invité</button>
+      <button class="share-btn" onclick="copyPin()" style="background:var(--bg);border-color:var(--border);color:var(--text2);margin-bottom:8px"><i class="ti ti-copy" style="font-size:15px"></i>Copier le code PIN seulement</button>
       <button class="regen-btn" onclick="regenPin()"><i class="ti ti-refresh" style="font-size:12px;margin-right:4px"></i>Générer un nouveau code</button>
     </div>
 
@@ -927,6 +928,16 @@ function regenPin(){
   showToast('Nouveau code généré',true);
 }
 
+function copyGuestLink(){
+  if(!D.pin){D.pin=genPin();}
+  var link=window.location.origin+window.location.pathname+'?pin='+D.pin;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(link).then(function(){showToast('Lien copié !',true);});
+  } else {
+    showToast('Lien : '+link,true);
+  }
+}
+
 function copyPin(){
   var txt='Code PIN invité Homsecur : '+D.pin+' ('+D.house+')';
   if(navigator.clipboard){
@@ -1149,11 +1160,35 @@ codeInputs.forEach(function(id){
 window.onload=function(){
   if(D.zones.length===0){D.zones=initZones();}
   initFirebase();
-  // Vérifier si c'est un invité qui revient
-  var autoGuest = checkAutoGuestLogin();
-  if(!autoGuest){
-    loadData();
+  // Vérifier si PIN dans l'URL (mode invité via lien)
+  var urlParams=new URLSearchParams(window.location.search);
+  var urlPin=urlParams.get('pin');
+  if(urlPin){
+    // Sauvegarder le PIN reçu pour vérification
+    var savedData=null;
+    try{savedData=localStorage.getItem('hsc_data');}catch(e){}
+    if(savedData){
+      var parsed=JSON.parse(savedData);
+      if(parsed&&parsed.pin&&urlPin===parsed.pin){
+        // PIN correct - connexion directe
+        var guestName=null;
+        try{guestName=localStorage.getItem('hsc_guest_name');}catch(e){}
+        if(guestName){
+          finishGuestLogin(guestName);
+        } else {
+          // Demander le prénom une seule fois
+          if(g('guest-name-input')){g('guest-name-input').value='';}
+          g('modal-guest-name').classList.add('open');
+        }
+        return;
+      }
+    }
+    // Si pas de données proprio, stocker le PIN pour vérification ultérieure
+    try{localStorage.setItem('hsc_url_pin',urlPin);}catch(e){}
   }
+  // Vérifier auto-login invité
+  var autoGuest=checkAutoGuestLogin();
+  if(!autoGuest){loadData();}
 };
 </script>
 <script>
