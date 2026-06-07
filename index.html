@@ -1130,6 +1130,14 @@ function saveSettings(){
   D.code=g('cfg-code')?g('cfg-code').value.trim():'';
   if(g('h-name')){g('h-name').textContent=D.name;}
   if(g('h-house')){g('h-house').textContent=D.house;}
+  // Sauvegarder config pour les invités dans Firebase
+  if(firebaseDb){
+    firebaseDb.ref('owner_config').set({
+      central:D.central,
+      code:D.code,
+      house:D.house
+    });
+  }
   saveData();
   showToast('Réglages enregistrés ✓',true);
 }
@@ -1160,31 +1168,28 @@ codeInputs.forEach(function(id){
 window.onload=function(){
   if(D.zones.length===0){D.zones=initZones();}
   initFirebase();
-  // Vérifier si PIN dans l'URL (mode invité via lien)
+  // Vérifier si PIN dans l'URL
   var urlParams=new URLSearchParams(window.location.search);
   var urlPin=urlParams.get('pin');
   if(urlPin){
-    // Sauvegarder le PIN reçu pour vérification
-    var savedData=null;
-    try{savedData=localStorage.getItem('hsc_data');}catch(e){}
-    if(savedData){
-      var parsed=JSON.parse(savedData);
-      if(parsed&&parsed.pin&&urlPin===parsed.pin){
-        // PIN correct - connexion directe
-        var guestName=null;
-        try{guestName=localStorage.getItem('hsc_guest_name');}catch(e){}
-        if(guestName){
-          finishGuestLogin(guestName);
-        } else {
-          // Demander le prénom une seule fois
-          if(g('guest-name-input')){g('guest-name-input').value='';}
-          g('modal-guest-name').classList.add('open');
-        }
-        return;
-      }
-    }
-    // Si pas de données proprio, stocker le PIN pour vérification ultérieure
+    // Stocker le PIN reçu
     try{localStorage.setItem('hsc_url_pin',urlPin);}catch(e){}
+    // Vérifier si invité déjà connecté avec ce PIN
+    var guestName=null;
+    try{guestName=localStorage.getItem('hsc_guest_name');}catch(e){}
+    var savedPin=null;
+    try{savedPin=localStorage.getItem('hsc_guest_pin');}catch(e){}
+    if(guestName&&savedPin===urlPin){
+      // Reconnexion automatique
+      finishGuestLogin(guestName);
+      return;
+    }
+    // Première fois - demander le prénom directement
+    if(g('guest-name-input')){g('guest-name-input').value='';}
+    setTimeout(function(){
+      g('modal-guest-name').classList.add('open');
+    },300);
+    return;
   }
   // Vérifier auto-login invité
   var autoGuest=checkAutoGuestLogin();
@@ -1264,12 +1269,41 @@ function confirmGuestName(){
   var name=g('guest-name-input')?g('guest-name-input').value.trim():'';
   if(!name){showToast('Entrez votre prénom',false);return;}
   closeModal('modal-guest-name');
-  // Sauvegarder le prénom pour les prochaines fois
-  try{ localStorage.setItem('hsc_guest_name', name); localStorage.setItem('hsc_is_guest','true'); }catch(e){}
+  // Sauvegarder nom et PIN pour reconnexion automatique
+  try{
+    localStorage.setItem('hsc_guest_name',name);
+    localStorage.setItem('hsc_is_guest','true');
+    var urlPin=localStorage.getItem('hsc_url_pin');
+    if(urlPin){localStorage.setItem('hsc_guest_pin',urlPin);}
+  }catch(e){}
   finishGuestLogin(name);
 }
 
 function finishGuestLogin(name){
+  // Récupérer les données du propriétaire depuis localStorage si disponibles
+  try{
+    var ownerData=localStorage.getItem('hsc_data');
+    if(ownerData){
+      var parsed=JSON.parse(ownerData);
+      if(parsed&&parsed.central){
+        D.central=parsed.central;
+        D.code=parsed.code||'';
+        D.house=parsed.house||'Maison';
+      }
+    }
+    // Si pas de données locales, essayer Firebase
+    if(!D.central&&firebaseDb){
+      firebaseDb.ref('owner_config').once('value',function(snap){
+        var config=snap.val();
+        if(config){
+          D.central=config.central||'';
+          D.code=config.code||'';
+          D.house=config.house||'Maison';
+          if(g('g-house')){g('g-house').textContent=D.house;}
+        }
+      });
+    }
+  }catch(e){}
   registerGuest(name);
   isGuest=true;
   if(g('g-house')){g('g-house').textContent=D.house||'Maison';}
