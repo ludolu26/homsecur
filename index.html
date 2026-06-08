@@ -358,17 +358,6 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;bac
 
   <!-- ACCUEIL -->
   <div class="page active" id="page-home">
-    <div class="status-bar" style="margin-top:1rem">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div class="sdot" id="sdot"></div>
-        <div><div class="slabel" id="slabel">Désarmé</div><div class="stime" id="stime">En attente</div></div>
-      </div>
-      <span class="sbadge ok" id="sbadge">Sécurisé</span>
-    </div>
-    <div class="alert-banner" id="alert-banner">
-      <i class="ti ti-alert-triangle"></i>
-      <div><div class="ab-title">⚠ Déclenchement !</div><div class="ab-zones" id="ab-zones"></div></div>
-    </div>
     <div class="sec">Commandes alarme</div>
     <div class="btn-grid">
       <button class="abtn arm" onclick="openAlarm('arm')"><i class="ti ti-lock"></i><div class="bl">Armement total</div><div class="bs">Hors domicile</div></button>
@@ -385,9 +374,6 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;bac
       <div class="zones-grid" id="zones-home"></div>
       <div class="zones-empty" id="zones-empty-msg" style="display:none">Aucune zone configurée — allez dans Zones.</div>
     </div>
-    <div class="divider"></div>
-    <div class="sec">Historique</div>
-    <div class="hist-list" id="hist-list"><div class="hist-empty">Aucun événement pour l'instant.</div></div>
   </div>
 
   <!-- ZONES -->
@@ -494,13 +480,6 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;bac
     <div><span class="guest-badge"><i class="ti ti-user" style="font-size:10px"></i>Mode invité</span></div>
   </div>
   <div class="guest-body">
-    <div class="status-bar" style="margin-bottom:1.25rem">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div class="sdot" id="g-sdot"></div>
-        <div><div class="slabel" id="g-slabel">Désarmé</div><div class="stime" id="g-stime">En attente</div></div>
-      </div>
-      <span class="sbadge ok" id="g-sbadge">Sécurisé</span>
-    </div>
     <div class="sec">Commandes disponibles</div>
     <div class="btn-grid">
       <button class="abtn arm" onclick="openAlarm('arm',true)"><i class="ti ti-lock"></i><div class="bl">Armement total</div><div class="bs">Hors domicile</div></button>
